@@ -51,28 +51,67 @@ function renderParishionerList() {
     return;
   }
 
-  listEl.innerHTML = list
-    .map((p) => {
-      const age = calcAge(p.birthDate);
-      const sub = [p.position, p.department, age ? `${age}세` : null, p.phone].filter(Boolean).join(" · ");
-      const statusBadge =
-        p.memberStatus && p.memberStatus !== "active"
-          ? `<span class="badge muted">${escapeHtml(MEMBER_STATUS_LABEL[p.memberStatus] || p.memberStatus)}</span>`
-          : "";
-      const thumb = p.photoUrl
-        ? `<div class="list-avatar"><img src="${p.photoUrl}" alt="" /></div>`
-        : `<div class="list-avatar list-avatar-empty">${escapeHtml((p.name || "").slice(0, 1))}</div>`;
-      return `
-        <div class="list-card" data-id="${p.id}" data-role="parishioner-open">
-          ${thumb}
-          <div class="list-card-main">
-            <div class="list-card-title">${escapeHtml(p.name)} ${statusBadge}</div>
-            <div class="list-card-sub">${escapeHtml(sub || "정보 없음")}</div>
-          </div>
-        </div>
-      `;
-    })
-    .join("");
+  const familyOf = (familyId) => (typeof families !== "undefined" ? families.find((f) => f.id === familyId) : null);
+
+  listEl.innerHTML = `
+    <div class="parishioner-table-wrap">
+      <table class="parishioner-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>이름</th>
+            <th>성별</th>
+            <th>나이</th>
+            <th>생년월일</th>
+            <th>직분</th>
+            <th>부서</th>
+            <th>구역/속</th>
+            <th>전화번호</th>
+            <th>신급</th>
+            <th>가족</th>
+            <th>등록일</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list
+            .map((p) => {
+              const age = calcAge(p.birthDate);
+              const genderLabel = p.gender === "M" ? "남" : p.gender === "F" ? "여" : "-";
+              const thumb = p.photoUrl
+                ? `<div class="list-avatar pt-avatar"><img src="${p.photoUrl}" alt="" /></div>`
+                : `<div class="list-avatar pt-avatar list-avatar-empty">${escapeHtml((p.name || "").slice(0, 1))}</div>`;
+              const isActive = !p.memberStatus || p.memberStatus === "active";
+              const statusBadge = isActive
+                ? `<span class="badge badge-active">재적</span>`
+                : `<span class="badge muted">${escapeHtml(MEMBER_STATUS_LABEL[p.memberStatus] || p.memberStatus)}</span>`;
+              const fam = familyOf(p.familyId);
+              const famCell = fam
+                ? `${escapeHtml(fam.name)}${p.familyRole ? `<span class="pt-muted">(${escapeHtml(p.familyRole)})</span>` : ""}`
+                : "-";
+              return `
+                <tr data-id="${p.id}" data-role="parishioner-open">
+                  <td>${thumb}</td>
+                  <td class="pt-name">${escapeHtml(p.name)}</td>
+                  <td>${genderLabel}</td>
+                  <td>${age ? age + "세" : "-"}</td>
+                  <td>${p.birthDate ? escapeHtml(p.birthDate) : "-"}</td>
+                  <td>${p.position ? escapeHtml(p.position) : "-"}</td>
+                  <td>${p.department ? escapeHtml(p.department) : "-"}</td>
+                  <td>${p.cell || p.district ? escapeHtml(p.cell || p.district) : "-"}</td>
+                  <td>${p.phone ? escapeHtml(p.phone) : "-"}</td>
+                  <td>${p.faithLevel ? escapeHtml(p.faithLevel) : "-"}</td>
+                  <td>${famCell}</td>
+                  <td>${p.registrationDate ? escapeHtml(p.registrationDate) : "-"}</td>
+                  <td>${statusBadge}</td>
+                </tr>
+              `;
+            })
+            .join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
 
   listEl.querySelectorAll('[data-role="parishioner-open"]').forEach((el) => {
     el.addEventListener("click", () => openParishionerModal(el.dataset.id));

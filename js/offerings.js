@@ -31,6 +31,13 @@ function fmtWon(n) {
   return (n || 0).toLocaleString("ko-KR") + "원";
 }
 
+function fmtWonShort(n) {
+  const amt = Number(n) || 0;
+  if (amt === 0) return "";
+  if (amt >= 10000) return Math.round(amt / 10000).toLocaleString("ko-KR") + "만";
+  return amt.toLocaleString("ko-KR");
+}
+
 function parishionerName(id) {
   const p = parishioners.find((x) => x.id === id);
   return p ? p.name : "(무기명)";
@@ -117,6 +124,7 @@ document.getElementById("addOfferingBtn").addEventListener("click", async () => 
     await loadOfferings();
     renderOfferingList();
     renderOfferingSummary();
+    renderOfferingStats();
     // 입력폼 초기화 (날짜/항목은 연속 입력 편의상 유지)
     amountEl.value = "";
     document.getElementById("offeringMemo").value = "";
@@ -194,6 +202,7 @@ async function deleteOffering(id) {
     await loadOfferings();
     renderOfferingList();
     renderOfferingSummary();
+    renderOfferingStats();
     showToast("삭제되었습니다.");
   } catch (e) {
     await alertDialog("삭제 중 오류가 발생했습니다: " + (e.message || e));
@@ -214,7 +223,107 @@ document.getElementById("offeringYearSelect").addEventListener("change", (e) => 
   offeringsYear = Number(e.target.value);
   renderOfferingList();
   renderOfferingSummary();
+  renderOfferingStats();
 });
+
+/* ---------------------------------------------------------
+   헌금 통계 (선택한 연도 기준)
+   --------------------------------------------------------- */
+function renderOfferingStats() {
+  const list = offeringsForYear(offeringsYear);
+  const total = list.reduce((sum, o) => sum + (Number(o.amount) || 0), 0);
+  const monthsWithData = new Set(list.map((o) => (o.offeringDate || "").slice(5, 7)).filter(Boolean));
+  const monthlyAvg = monthsWithData.size ? Math.round(total / monthsWithData.size) : 0;
+  const giverIds = new Set(list.filter((o) => o.parishionerId).map((o) => o.parishionerId));
+
+  document.getElementById("offeringStatTotalLabel").textContent = `${offeringsYear}년 총액`;
+  document.getElementById("offeringStatTotal").textContent = fmtWon(total);
+  document.getElementById("offeringStatAvg").textContent = fmtWon(monthlyAvg);
+  document.getElementById("offeringStatGivers").textContent = giverIds.size.toLocaleString("ko-KR") + "명";
+
+  renderOfferingMonthlyChart(list);
+  renderOfferingTypeBreakdown(list, total);
+}
+
+function renderOfferingMonthlyChart(list) {
+  const wrap = document.getElementById("offeringMonthlyChart");
+  const monthAmounts = Array(12).fill(0);
+  list.forEach((o) => {
+    const m = Number((o.offeringDate || "").slice(5, 7));
+    if (m >= 1 && m <= 12) monthAmounts[m - 1] += Number(o.amount) || 0;
+  });
+  const max = Math.max(1, ...monthAmounts);
+
+  if (monthAmounts.every((v) => v === 0)) {
+    wrap.innerHTML = '<div class="empty">해당 연도 기록이 없습니다.</div>';
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="home-chart">
+      ${monthAmounts
+        .map((amt, i) => {
+          const h = amt > 0 ? Math.max(Math.round((amt / max) * 100), 6) : 0;
+          return `
+            <div class="home-chart-col">
+              <div class="home-chart-value">${fmtWonShort(amt)}</div>
+              <div class="home-chart-bar-track">
+                <div class="home-chart-bar" style="height:${h}%"></div>
+              </div>
+              <div class="home-chart-label">${i + 1}월</div>
+            </div>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderOfferingTypeBreakdown(list, total) {
+  const wrap = document.getElementById("offeringTypeBreakdown");
+  if (list.length === 0) {
+    wrap.innerHTML = '<div class="empty">해당 연도 기록이 없습니다.</div>';
+    return;
+  }
+  const byType = {};
+  list.forEach((o) => {
+    const t = o.offeringType || "기타";
+    if (!byType[t]) byType[t] = { count: 0, amount: 0 };
+    byType[t].count += 1;
+    byType[t].amount += Number(o.amount) || 0;
+  });
+  const rows = Object.entries(byType)
+    .map(([type, v]) => ({ type, ...v }))
+    .sort((a, b) => b.amount - a.amount);
+
+  wrap.innerHTML = `
+    <table class="home-dept-table-el">
+      <thead>
+        <tr><th>항목</th><th>건수</th><th>금액</th><th>비율</th></tr>
+      </thead>
+      <tbody>
+        ${rows
+          .map((r) => {
+            const pct = total ? Math.round((r.amount / total) * 100) : 0;
+            return `
+              <tr>
+                <td>${escapeHtml(r.type)}</td>
+                <td>${r.count}건</td>
+                <td>${fmtWon(r.amount)}</td>
+                <td>
+                  <div class="home-dept-bar-row">
+                    <div class="home-dept-bar-track"><div class="home-dept-bar" style="width:${pct}%"></div></div>
+                    <span class="home-dept-pct">${pct}%</span>
+                  </div>
+                </td>
+              </tr>
+            `;
+          })
+          .join("")}
+      </tbody>
+    </table>
+  `;
+}
 
 function renderOfferingSummary() {
   const wrap = document.getElementById("offeringSummary");

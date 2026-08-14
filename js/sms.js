@@ -34,6 +34,7 @@ function switchMainPanel(panel) {
       if (offerings.length === 0) await loadOfferings();
       renderOfferingList();
       renderOfferingSummary();
+      renderOfferingStats();
     })();
   } else if (panel === "education") {
     (async () => {

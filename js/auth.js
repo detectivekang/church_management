@@ -118,7 +118,7 @@ async function routeAfterAuth(user) {
   }
 
   document.getElementById("churchNameLabel").textContent = currentChurchData.name || "";
-  await loadParishioners();
+  await Promise.all([loadParishioners(), loadFamilies()]);
   renderParishionerList();
   renderHome();
   showScreen("mainScreen");

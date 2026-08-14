@@ -221,8 +221,40 @@
         <button id="addOfferingBtn" type="button" class="btn wide" style="margin-top: 6px">등록</button>
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 26px">
-          <div class="form-section-title" style="margin: 0">최근 헌금 기록</div>
+          <div class="form-section-title" style="margin: 0">헌금 통계</div>
           <select id="offeringYearSelect" class="toolbar-select"></select>
+        </div>
+
+        <div class="home-stats-grid" style="margin-top: 10px">
+          <div class="home-stat-card stat-blue">
+            <div class="home-stat-icon" aria-hidden="true">💰</div>
+            <div class="home-stat-value" id="offeringStatTotal">0원</div>
+            <div class="home-stat-label" id="offeringStatTotalLabel">연간 총액</div>
+          </div>
+          <div class="home-stat-card stat-green">
+            <div class="home-stat-icon" aria-hidden="true">📈</div>
+            <div class="home-stat-value" id="offeringStatAvg">0원</div>
+            <div class="home-stat-label">월 평균</div>
+          </div>
+          <div class="home-stat-card stat-orange">
+            <div class="home-stat-icon" aria-hidden="true">🙋</div>
+            <div class="home-stat-value" id="offeringStatGivers">0명</div>
+            <div class="home-stat-label">헌금 참여 인원</div>
+          </div>
+        </div>
+
+        <div class="home-section">
+          <div class="form-section-title">월별 헌금 추이</div>
+          <div id="offeringMonthlyChart" class="home-chart-wrap"></div>
+        </div>
+
+        <div class="home-section">
+          <div class="form-section-title">항목별 비중</div>
+          <div id="offeringTypeBreakdown" class="home-dept-table"></div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 26px">
+          <div class="form-section-title" style="margin: 0">최근 헌금 기록</div>
         </div>
         <input
           id="offeringSearchInput"

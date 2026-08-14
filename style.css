@@ -405,6 +405,7 @@ input.field-error {
   max-width: 900px;
   margin: 0 auto;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
 }
 .app-nav-tab {
@@ -902,6 +903,7 @@ input.field-error {
   display: flex;
   gap: 10px;
   overflow-x: auto;
+  overflow-y: hidden;
   padding-bottom: 4px;
   -webkit-overflow-scrolling: touch;
 }
@@ -958,6 +960,7 @@ input.field-error {
   border-radius: 12px;
   padding: 6px 12px;
   overflow-x: auto;
+  overflow-y: hidden;
 }
 .home-dept-table-el {
   width: 100%;
@@ -1015,5 +1018,73 @@ input.field-error {
   }
   .home-stat-value {
     font-size: 19px;
+  }
+}
+
+/* =========================================================
+   교인 상세정보 목록 - 상세 테이블
+   ========================================================= */
+.parishioner-table-wrap {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.parishioner-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  min-width: 860px;
+}
+.parishioner-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f6f7f9;
+  color: #6b7686;
+  font-weight: 700;
+  font-size: 11.5px;
+  padding: 10px 10px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+}
+.parishioner-table tbody tr {
+  cursor: pointer;
+  border-bottom: 1px solid var(--line);
+}
+.parishioner-table tbody tr:last-child {
+  border-bottom: none;
+}
+.parishioner-table tbody tr:hover {
+  background: #f6f9fc;
+}
+.parishioner-table td {
+  padding: 8px 10px;
+  white-space: nowrap;
+  color: var(--ink);
+  vertical-align: middle;
+}
+.parishioner-table .pt-name {
+  font-weight: 700;
+}
+.parishioner-table .pt-muted {
+  color: #8892a0;
+  font-size: 11px;
+  margin-left: 3px;
+}
+.pt-avatar {
+  width: 30px;
+  height: 30px;
+}
+.badge.badge-active {
+  background: #e4f4ee;
+  color: #1f7d63;
+}
+@media (max-width: 640px) {
+  .parishioner-table {
+    min-width: 760px;
+    font-size: 12px;
   }
 }
