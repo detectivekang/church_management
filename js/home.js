@@ -20,11 +20,15 @@ function homeIsInCurrentMonth(dateStr) {
   return dateStr.startsWith(ym);
 }
 
+let notices = [];
+
 function renderHome() {
   renderHomeStats();
   renderHomeMonthlyChart();
+  renderHomeBirthdays();
   renderHomeNewFamily();
   renderHomeDeptTable();
+  loadAndRenderNotices();
 }
 
 /* ---------------------------------------------------------
@@ -79,6 +83,44 @@ function renderHomeMonthlyChart() {
         .join("")}
     </div>
   `;
+}
+
+/* ---------------------------------------------------------
+   이번 달 생일자
+   --------------------------------------------------------- */
+function renderHomeBirthdays() {
+  const wrap = document.getElementById("homeBirthdayList");
+  const thisMonth = String(new Date().getMonth() + 1).padStart(2, "0");
+  const list = parishioners
+    .filter((p) => (p.memberStatus || "active") === "active" && p.birthDate && p.birthDate.split("-")[1] === thisMonth)
+    .sort((a, b) => Number(a.birthDate.split("-")[2]) - Number(b.birthDate.split("-")[2]));
+
+  if (list.length === 0) {
+    wrap.innerHTML = '<div class="empty">이번 달 생일인 교인이 없습니다.</div>';
+    return;
+  }
+
+  wrap.innerHTML = list
+    .map((p) => {
+      const day = Number(p.birthDate.split("-")[2]);
+      const thumb = p.photoUrl
+        ? `<div class="home-newfamily-avatar"><img src="${p.photoUrl}" alt="" /></div>`
+        : `<div class="home-newfamily-avatar home-newfamily-avatar-empty">${escapeHtml((p.name || "").slice(0, 1))}</div>`;
+      return `
+        <div class="home-newfamily-card" data-id="${p.id}" data-act="home-open-parishioner">
+          ${thumb}
+          <div class="home-newfamily-name">${escapeHtml(p.name)}</div>
+          <div class="home-newfamily-sub">${day}일</div>
+        </div>
+      `;
+    })
+    .join("");
+  wrap.querySelectorAll('[data-act="home-open-parishioner"]').forEach((el) => {
+    el.addEventListener("click", () => {
+      switchMainPanel("parishioners");
+      openParishionerModal(el.dataset.id);
+    });
+  });
 }
 
 /* ---------------------------------------------------------
@@ -171,3 +213,79 @@ function renderHomeDeptTable() {
     </table>
   `;
 }
+
+/* ---------------------------------------------------------
+   공지사항 - notices 테이블은 교회 출석부 앱과 공유합니다.
+   여기서 올린 공지가 출석부 쪽 홈화면에도 그대로 보입니다.
+   --------------------------------------------------------- */
+async function loadAndRenderNotices() {
+  const wrap = document.getElementById("homeNoticeList");
+  wrap.innerHTML = '<div class="empty">불러오는 중...</div>';
+  try {
+    const snap = await churchCol("notices").orderBy("createdAt", "desc").limit(5).get();
+    notices = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    wrap.innerHTML = '<div class="empty">공지사항을 불러오지 못했습니다.</div>';
+    return;
+  }
+  renderHomeNotices();
+}
+
+function renderHomeNotices() {
+  const wrap = document.getElementById("homeNoticeList");
+  if (notices.length === 0) {
+    wrap.innerHTML = '<div class="empty">등록된 공지사항이 없습니다.</div>';
+    return;
+  }
+  wrap.innerHTML = notices
+    .map(
+      (n) => `
+        <div class="home-notice-row">
+          <div class="home-notice-dot" aria-hidden="true"></div>
+          <div class="home-notice-content">${escapeHtml(n.content || "")}</div>
+          <button type="button" class="home-notice-delete" data-id="${n.id}" data-act="delete-notice" aria-label="삭제">✕</button>
+        </div>
+      `,
+    )
+    .join("");
+  wrap.querySelectorAll('[data-act="delete-notice"]').forEach((btn) => {
+    btn.addEventListener("click", () => deleteNotice(btn.dataset.id));
+  });
+}
+
+async function addNotice() {
+  const input = document.getElementById("homeNoticeInput");
+  const content = input.value.trim();
+  if (!content) return;
+  const btn = document.getElementById("homeNoticeAddBtn");
+  btn.disabled = true;
+  try {
+    await churchCol("notices").add({
+      content,
+      popup: false,
+      createdBy: (currentUser && currentUser.email) || "",
+    });
+    input.value = "";
+    await loadAndRenderNotices();
+  } catch (e) {
+    alertDialog("공지 등록 중 오류가 발생했습니다: " + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function deleteNotice(id) {
+  const ok = await confirmDialog("이 공지를 삭제할까요?");
+  if (!ok) return;
+  try {
+    await churchCol("notices").doc(id).delete();
+    await loadAndRenderNotices();
+  } catch (e) {
+    alertDialog("삭제 중 오류가 발생했습니다: " + e.message);
+  }
+}
+
+document.getElementById("homeNoticeAddBtn").addEventListener("click", addNotice);
+document.getElementById("homeNoticeInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addNotice();
+});

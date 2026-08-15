@@ -24,6 +24,7 @@ function switchMainPanel(panel) {
   document.getElementById("orgPanel").style.display = panel === "org" ? "" : "none";
   document.getElementById("familiesPanel").style.display = panel === "families" ? "" : "none";
   document.getElementById("eventsPanel").style.display = panel === "events" ? "" : "none";
+  document.getElementById("syncPanel").style.display = panel === "sync" ? "" : "none";
   if (panel === "home") {
     renderHome();
   } else if (panel === "sms") {
@@ -56,6 +57,8 @@ function switchMainPanel(panel) {
       if (events.length === 0) await loadEvents();
       renderEventList();
     })();
+  } else if (panel === "sync") {
+    openAttendanceSyncPanel();
   }
 }
 

@@ -443,6 +443,25 @@ const REL_TABLES = {
       createdBy: "created_by",
     },
   },
+  /* [신규] 교회 출석부 <-> 교회관리시스템 자동 연동 대기열.
+     members insert 트리거가 동명이인 등 애매한 매칭을 만나면
+     여기에 쌓아두고, "출석부 연동" 화면에서 관리자가 직접 확정함 */
+  memberLinkQueue: {
+    table: "member_link_queue",
+    columns: {
+      memberId: "member_id",
+      memberName: "member_name",
+      memberBirthday: "member_birthday",
+      groupId: "group_id",
+      groupName: "group_name",
+      candidateIds: "candidate_ids",
+      status: "status",
+      resolvedParishionerId: "resolved_parishioner_id",
+      resolvedAt: "resolved_at",
+      resolvedBy: "resolved_by",
+      createdAt: "created_at",
+    },
+  },
   /* [신규] 심방기록 - parishioners(교적) 한 명당 여러 건 */
   visitations: {
     table: "visitations",

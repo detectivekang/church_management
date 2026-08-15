@@ -480,8 +480,22 @@ function tabBasicHtml(data) {
   return photoBlockHtml(data) + sectionHtml(sectionByTitle("기본정보"), data) + addressBlockHtml(data) +
     sectionHtml(sectionByTitle("등록정보"), data) + smsOptOutBlockHtml(data);
 }
+function attendanceLinkBlockHtml(data) {
+  if (!data.id) return "";
+  return `
+    <div class="form-section">
+      <div class="form-section-title">출석부 연동</div>
+      ${
+        data.linkedMemberId
+          ? `<div class="hint-text" style="margin-top:0">🔗 출석부와 연동되어 있습니다.</div>
+             <button type="button" class="btn ghost small" id="pf_unlinkBtn" style="margin-top:6px">연동 해제</button>`
+          : `<div class="hint-text" style="margin-top:0">출석부와 연동되지 않았습니다. 이름 · 생일이 같은 팀원이 출석부에 새로 등록되면 자동으로 연동됩니다.</div>`
+      }
+    </div>
+  `;
+}
 function tabFaithHtml(data) {
-  return sectionHtml(sectionByTitle("신앙정보"), data) + sectionHtml(sectionByTitle("소속정보"), data) + referrerBlockHtml(data);
+  return sectionHtml(sectionByTitle("신앙정보"), data) + sectionHtml(sectionByTitle("소속정보"), data) + referrerBlockHtml(data) + attendanceLinkBlockHtml(data);
 }
 function tabFamilyHtml(data) {
   return sectionHtml(sectionByTitle("가족정보"), data) + familyInfoBlockHtml(data) + sectionHtml(sectionByTitle("직장/학력"), data);
@@ -556,6 +570,14 @@ async function openParishionerModal(id) {
   overlay.querySelectorAll(".modal-tab").forEach((btn) => {
     btn.addEventListener("click", () => switchParishionerModalTab(btn.dataset.tab, id));
   });
+
+  const unlinkBtn = document.getElementById("pf_unlinkBtn");
+  if (unlinkBtn) {
+    unlinkBtn.addEventListener("click", async () => {
+      const ok = await unlinkParishionerFromMember(id);
+      if (ok) closeParishionerModal();
+    });
+  }
 }
 
 async function switchParishionerModalTab(tab, parishionerId) {
