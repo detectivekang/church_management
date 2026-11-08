@@ -218,6 +218,16 @@
           class="toolbar-search"
           style="margin: 8px 0"
         />
+        <div class="sms-history-tools">
+          <select id="smsHistoryCleanupSelect" class="roster-status-select">
+            <option value="1">1개월</option>
+            <option value="3" selected>3개월</option>
+            <option value="6">6개월</option>
+            <option value="12">1년</option>
+          </select>
+          <button id="smsHistoryCleanupBtn" type="button" class="btn ghost small">이전 이력 삭제</button>
+          <button id="smsHistoryClearAllBtn" type="button" class="btn ghost small" style="margin-left: auto; color: #b0392b">전체 삭제</button>
+        </div>
         <div id="smsHistoryList" class="list-wrap"></div>
       </main>
       <main class="app-main" id="offeringsPanel" style="display: none">

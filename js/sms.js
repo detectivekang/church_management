@@ -321,22 +321,25 @@ document.getElementById("manualSmsBtn").addEventListener("click", async () => {
 });
 
 /* ---------------------------------------------------------
-   발송 이력
+   발송 이력 - 검색 + 페이지 나누기 + 개별 삭제
    --------------------------------------------------------- */
 let smsHistorySearchKeyword = "";
+let smsHistoryPage = 1;
+const smsHistoryExpanded = new Set();
+const SMS_HISTORY_PAGE_SIZE = 5;
 
 async function loadSmsHistory() {
   const snap = await churchCol("smsLogs").get();
   smsHistory = snap.docs
     .map((d) => ({ id: d.id, ...d.data() }))
     .sort((a, b) => (b.sentAt || 0) - (a.sentAt || 0))
-    .slice(0, 100);
+    .slice(0, 200);
   renderSmsHistory();
 }
 
 function filteredSmsHistory() {
   const kw = smsHistorySearchKeyword.trim();
-  if (!kw) return smsHistory.slice(0, 20);
+  if (!kw) return smsHistory;
   return smsHistory.filter((h) =>
     [h.message, ...(h.recipientNames || [])].filter(Boolean).join(" ").includes(kw),
   );
@@ -353,27 +356,146 @@ function renderSmsHistory() {
     wrap.innerHTML = '<div class="empty">검색 결과가 없습니다.</div>';
     return;
   }
-  wrap.innerHTML = list
+
+  const totalPages = Math.max(1, Math.ceil(list.length / SMS_HISTORY_PAGE_SIZE));
+  if (smsHistoryPage > totalPages) smsHistoryPage = totalPages;
+  if (smsHistoryPage < 1) smsHistoryPage = 1;
+  const pageItems = list.slice(
+    (smsHistoryPage - 1) * SMS_HISTORY_PAGE_SIZE,
+    smsHistoryPage * SMS_HISTORY_PAGE_SIZE,
+  );
+
+  const statusMap = { sent: "발송완료", failed: "발송실패", partial: "일부발송", manual: "직접발송" };
+  const rows = pageItems
     .map((h) => {
       const date = h.sentAt ? new Date(h.sentAt).toLocaleString("ko-KR") : "";
-      const statusLabel = { sent: "발송완료", failed: "발송실패", partial: "일부발송", manual: "직접발송" }[h.status] || h.status;
-      const statusClass = h.status === "sent" ? "" : "danger";
+      const statusLabel = statusMap[h.status] || h.status;
+      const names = h.recipientNames || [];
+      const nameText =
+        names.length === 0
+          ? `${h.recipientCount}명`
+          : names.length <= 3
+            ? names.join(", ")
+            : `${names.slice(0, 3).join(", ")} 외 ${names.length - 3}명`;
+      const msg = h.message || "";
+      const open = smsHistoryExpanded.has(h.id);
+      let detail = "";
+      if (open) {
+        const showProvider = h.providerMessage && h.status !== "sent";
+        detail = `
+          <div class="sms-history-detail">
+            <div class="sms-history-detail-label">받는 사람 (${h.recipientCount}명)</div>
+            <div class="sms-history-detail-names">${names.length ? names.map((n) => `<span class="sms-history-chip">${escapeHtml(n)}</span>`).join("") : "이름 정보가 없습니다."}</div>
+            <div class="sms-history-detail-label">문자 내용</div>
+            <div class="sms-history-detail-msg">${escapeHtml(msg)}</div>
+            ${h.sentByEmail ? `<div class="sms-history-detail-label">보낸 사람</div><div>${escapeHtml(h.sentByEmail)}</div>` : ""}
+            ${showProvider ? `<div class="sms-history-detail-label">비고</div><div>${escapeHtml(h.providerMessage)}</div>` : ""}
+          </div>`;
+      }
       return `
-        <div class="list-card" style="cursor: default">
+        <div class="list-card sms-history-card" data-id="${h.id}" style="cursor: pointer; flex-wrap: wrap">
           <div class="list-card-main">
             <div class="list-card-title">
               ${escapeHtml(date)}
-              <span class="badge ${statusClass === "danger" ? "muted" : "muted"}">${escapeHtml(statusLabel)}</span>
+              <span class="badge muted">${escapeHtml(statusLabel)}</span>
+              <span class="sms-history-toggle">${open ? "▴" : "▾"}</span>
             </div>
-            <div class="list-card-sub">${h.recipientCount}명 · ${escapeHtml((h.message || "").slice(0, 40))}${(h.message || "").length > 40 ? "..." : ""}</div>
+            <div class="list-card-sub">${escapeHtml(nameText)} · ${escapeHtml(msg.slice(0, 40))}${msg.length > 40 ? "..." : ""}</div>
           </div>
+          <button type="button" class="visit-delete" data-id="${h.id}" data-act="delete-sms-log" title="이력 삭제">✕</button>
+          ${detail}
         </div>
       `;
     })
     .join("");
+
+  const pager =
+    totalPages > 1
+      ? `
+        <div class="sms-history-pager">
+          <button type="button" class="btn ghost small" data-act="sms-history-prev" ${smsHistoryPage <= 1 ? "disabled" : ""}>‹ 이전</button>
+          <span>${smsHistoryPage} / ${totalPages} 페이지 (총 ${list.length}건)</span>
+          <button type="button" class="btn ghost small" data-act="sms-history-next" ${smsHistoryPage >= totalPages ? "disabled" : ""}>다음 ›</button>
+        </div>`
+      : `<div class="list-count">총 ${list.length}건</div>`;
+
+  wrap.innerHTML = rows + pager;
 }
+
+async function deleteSmsLog(id) {
+  const ok = await confirmDialog("이 발송 이력을 삭제할까요?", "삭제", "취소");
+  if (!ok) return;
+  try {
+    await churchCol("smsLogs").doc(id).delete();
+    smsHistory = smsHistory.filter((h) => h.id !== id);
+    renderSmsHistory();
+  } catch (e) {
+    await alertDialog("삭제 중 오류가 발생했습니다: " + e.message);
+  }
+}
+
+document.getElementById("smsHistoryList").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-act]");
+  if (!btn) {
+    // 카드를 누르면 상세(받는 사람 전체 + 문자 전체 내용) 펼치기/접기
+    const card = e.target.closest(".sms-history-card");
+    if (card && !e.target.closest(".sms-history-detail")) {
+      const id = card.dataset.id;
+      if (smsHistoryExpanded.has(id)) smsHistoryExpanded.delete(id);
+      else smsHistoryExpanded.add(id);
+      renderSmsHistory();
+    }
+    return;
+  }
+  if (btn.disabled) return;
+  const act = btn.dataset.act;
+  if (act === "delete-sms-log") {
+    deleteSmsLog(btn.dataset.id);
+  } else if (act === "sms-history-prev") {
+    smsHistoryPage -= 1;
+    renderSmsHistory();
+  } else if (act === "sms-history-next") {
+    smsHistoryPage += 1;
+    renderSmsHistory();
+  }
+});
 
 document.getElementById("smsHistorySearchInput").addEventListener("input", (e) => {
   smsHistorySearchKeyword = e.target.value;
+  smsHistoryPage = 1;
   renderSmsHistory();
+});
+
+/* 이력 일괄 삭제 - 오래된 이력 정리 / 전체 삭제 */
+async function deleteSmsLogsBulk(targets, label) {
+  if (targets.length === 0) {
+    await alertDialog("삭제할 이력이 없습니다.");
+    return;
+  }
+  const ok = await confirmDialog(`${label} ${targets.length}건을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.`, "삭제", "취소");
+  if (!ok) return;
+  try {
+    const results = await Promise.allSettled(targets.map((h) => churchCol("smsLogs").doc(h.id).delete()));
+    const failed = results.filter((r) => r.status === "rejected").length;
+    await loadSmsHistory();
+    if (failed > 0) {
+      await alertDialog(`${targets.length - failed}건 삭제, ${failed}건은 삭제에 실패했습니다.`);
+    } else {
+      showToast(`${targets.length}건 삭제되었습니다.`);
+    }
+  } catch (e) {
+    await alertDialog("삭제 중 오류가 발생했습니다: " + e.message);
+  }
+}
+
+document.getElementById("smsHistoryCleanupBtn").addEventListener("click", () => {
+  const months = Number(document.getElementById("smsHistoryCleanupSelect").value);
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - months);
+  const targets = smsHistory.filter((h) => (h.sentAt || 0) < cutoff.getTime());
+  deleteSmsLogsBulk(targets, `${months === 12 ? "1년" : months + "개월"} 이전 이력`);
+});
+
+document.getElementById("smsHistoryClearAllBtn").addEventListener("click", () => {
+  deleteSmsLogsBulk(smsHistory.slice(), "발송 이력 전체");
 });
