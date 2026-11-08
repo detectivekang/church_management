@@ -11,6 +11,7 @@
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
     />
     <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   </head>
   <body>
     <!-- 로그인 화면 -->
@@ -166,6 +167,12 @@
           </select>
           <button id="addParishionerBtn" type="button" class="btn small">+ 교인 등록</button>
         </div>
+        <div class="toolbar" style="margin-top: -4px">
+          <button id="parishionerExcelTemplateBtn" type="button" class="btn ghost small">📄 엑셀 양식</button>
+          <button id="parishionerExcelExportBtn" type="button" class="btn ghost small">⬇ 엑셀 다운로드</button>
+          <label for="parishionerExcelImportInput" class="btn ghost small" style="cursor: pointer">⬆ 엑셀 업로드</label>
+          <input id="parishionerExcelImportInput" type="file" accept=".xlsx,.xls,.csv" style="display: none" />
+        </div>
         <div id="parishionerCount" class="list-count"></div>
         <div id="parishionerList" class="list-wrap"></div>
       </main>
@@ -195,7 +202,7 @@
         </div>
         <button id="sendSmsBtn" type="button" class="btn wide" style="margin-top: 8px">문자 발송 (자동)</button>
         <button id="manualSmsBtn" type="button" class="btn ghost wide" style="margin-top: 6px">
-          무료로 직접 보내기 (번호·내용 복사)
+          무료로 직접 보내기 (문자 앱 열기 + 번호·내용 복사)
         </button>
         <div class="hint-text" style="margin-top: 6px">
           "문자 발송"은 문자 대행업체(알리고 등) 가입과 발신번호 사전등록이 끝나야 자동으로 나갑니다(건당 비용 발생).
@@ -278,6 +285,7 @@
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 26px">
           <div class="form-section-title" style="margin: 0">최근 헌금 기록</div>
+          <button id="offeringExcelExportBtn" type="button" class="btn ghost small">⬇ 엑셀 다운로드</button>
         </div>
         <input
           id="offeringSearchInput"
@@ -305,7 +313,10 @@
         </div>
         <button id="addCourseBtn" type="button" class="btn wide" style="margin-top: 6px">과정 등록</button>
 
-        <div class="form-section-title" style="margin-top: 26px">교육과정 목록</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 26px">
+          <div class="form-section-title" style="margin: 0">교육과정 목록</div>
+          <button id="courseExcelExportBtn" type="button" class="btn ghost small">⬇ 엑셀 다운로드</button>
+        </div>
         <input
           id="courseSearchInput"
           type="text"
@@ -316,7 +327,10 @@
         <div id="courseList" class="list-wrap"></div>
 
         <div id="courseRosterWrap" style="display: none; margin-top: 26px">
-          <div id="courseRosterTitle" class="form-section-title"></div>
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div id="courseRosterTitle" class="form-section-title" style="margin: 0"></div>
+            <button id="courseRosterExcelExportBtn" type="button" class="btn ghost small">⬇ 엑셀 다운로드</button>
+          </div>
           <input
             id="eduPersonSearch"
             type="text"
@@ -355,7 +369,10 @@
         <div id="orgTreeWrap" class="list-wrap"></div>
 
         <div id="orgUnitRosterWrap" style="display: none; margin-top: 26px">
-          <div id="orgUnitRosterTitle" class="form-section-title"></div>
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div id="orgUnitRosterTitle" class="form-section-title" style="margin: 0"></div>
+            <button id="orgRosterExcelExportBtn" type="button" class="btn ghost small">⬇ 엑셀 다운로드</button>
+          </div>
 
           <div class="form-field" style="margin-top: 10px">
             <label for="orgLeaderSearch">담당자 (이름 검색)</label>
@@ -392,7 +409,10 @@
         </div>
         <button id="addFamilyBtn" type="button" class="btn wide" style="margin-top: 6px">가족 등록</button>
 
-        <div class="form-section-title" style="margin-top: 26px">가족 목록</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 26px">
+          <div class="form-section-title" style="margin: 0">가족 목록</div>
+          <button id="familyExcelExportBtn" type="button" class="btn ghost small">⬇ 엑셀 다운로드</button>
+        </div>
         <input
           id="familySearchInput"
           type="text"
@@ -403,7 +423,10 @@
         <div id="familyList" class="list-wrap"></div>
 
         <div id="familyRosterWrap" style="display: none; margin-top: 26px">
-          <div id="familyRosterTitle" class="form-section-title"></div>
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div id="familyRosterTitle" class="form-section-title" style="margin: 0"></div>
+            <button id="familyRosterExcelExportBtn" type="button" class="btn ghost small">⬇ 엑셀 다운로드</button>
+          </div>
           <input
             id="familyMemberSearch"
             type="text"
@@ -449,7 +472,10 @@
         </div>
         <button id="addEventBtn" type="button" class="btn wide" style="margin-top: 6px">행사 등록</button>
 
-        <div class="form-section-title" style="margin-top: 26px">행사 목록</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 26px">
+          <div class="form-section-title" style="margin: 0">행사 목록</div>
+          <button id="eventExcelExportBtn" type="button" class="btn ghost small">⬇ 엑셀 다운로드</button>
+        </div>
         <input
           id="eventSearchInput"
           type="text"
@@ -460,7 +486,10 @@
         <div id="eventList" class="list-wrap"></div>
 
         <div id="eventRosterWrap" style="display: none; margin-top: 26px">
-          <div id="eventRosterTitle" class="form-section-title"></div>
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div id="eventRosterTitle" class="form-section-title" style="margin: 0"></div>
+            <button id="eventRosterExcelExportBtn" type="button" class="btn ghost small">⬇ 엑셀 다운로드</button>
+          </div>
           <input
             id="eventParticipantSearch"
             type="text"
@@ -525,5 +554,6 @@
     <script src="js/families.js"></script>
     <script src="js/events.js"></script>
     <script src="js/attendance-sync.js"></script>
+    <script src="js/excel.js"></script>
   </body>
 </html>

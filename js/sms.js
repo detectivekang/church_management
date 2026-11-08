@@ -232,10 +232,29 @@ document.getElementById("sendSmsBtn").addEventListener("click", async () => {
 
 /* ---------------------------------------------------------
    무료로 직접 보내기 - 대행업체 없이, 선택된 사람들의 번호와
-   문자 내용을 클립보드에 복사해서 휴대폰 문자 앱에 직접 붙여넣어
-   보낼 수 있게 함. 받는 사람이 1명이면 sms: 링크도 함께 열어줌
-   (모바일 브라우저에서는 문자 앱이 바로 뜸).
+   문자 내용을 클립보드에 복사하고, 휴대폰이면 문자 앱을 바로 열어줌.
+   받는 사람이 여러 명이어도 sms: 링크에 모든 번호를 넣어서 열어줌
+   (iOS와 안드로이드는 다중 수신자 링크 형식이 달라서 구분함).
    --------------------------------------------------------- */
+function isIosDevice() {
+  const ua = navigator.userAgent || "";
+  return /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
+function isMobileDevice() {
+  return isIosDevice() || /Android/i.test(navigator.userAgent || "");
+}
+
+function buildSmsLink(phones, message) {
+  const body = encodeURIComponent(message);
+  if (isIosDevice()) {
+    // iOS: 여러 명이면 sms:/open?addresses=번호1,번호2&body=... 형식이어야 함
+    return `sms:/open?addresses=${phones.join(",")}&body=${body}`;
+  }
+  // 안드로이드: sms:번호1,번호2?body=...
+  return `sms:${phones.join(",")}?body=${body}`;
+}
+
 document.getElementById("manualSmsBtn").addEventListener("click", async () => {
   const messageEl = document.getElementById("smsMessage");
   const message = messageEl.value.trim();
@@ -265,8 +284,12 @@ document.getElementById("manualSmsBtn").addEventListener("click", async () => {
     copied = false;
   }
 
-  if (phones.length === 1) {
-    window.open(`sms:${phones[0]}?body=${encodeURIComponent(message)}`, "_blank");
+  // 모바일이면 1명이든 여러 명이든 문자 앱을 열어줌
+  // (window.open은 await 뒤에서 팝업으로 차단될 수 있어 location.href 사용)
+  let smsOpened = false;
+  if (isMobileDevice()) {
+    window.location.href = buildSmsLink(phones, message);
+    smsOpened = true;
   }
 
   try {
@@ -286,8 +309,8 @@ document.getElementById("manualSmsBtn").addEventListener("click", async () => {
 
   if (copied) {
     await alertDialog(
-      phones.length === 1
-        ? "번호와 문자 내용이 클립보드에 복사되었고, 문자 앱이 열렸는지 확인해주세요.\n안 열렸다면 문자 앱에 직접 붙여넣어 보내주세요."
+      smsOpened
+        ? `문자 앱이 열렸는지 확인해주세요. (받는 사람 ${phones.length}명, 내용 자동 입력)\n받는 사람이 다 안 들어갔거나 앱이 안 열렸다면, 번호와 내용이 클립보드에 복사되어 있으니 문자 앱에 붙여넣어 보내주세요.`
         : `번호 ${phones.length}개와 문자 내용이 클립보드에 복사되었습니다.\n휴대폰 문자 앱을 열어 받는사람란에 붙여넣고 보내주세요.`,
     );
   } else {
