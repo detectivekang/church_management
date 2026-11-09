@@ -63,6 +63,12 @@
           이 시스템은 운영자(목회자) 계정만 이용할 수 있습니다.<br />
           그룹장/팀장 업무는 교회출석부 앱을 이용해주세요.
         </p>
+        <a
+          class="app-link-btn"
+          href="https://church-attendance-six.vercel.app/"
+          data-sso-link
+          >📋 교회 출석부로 이동</a
+        >
         <button id="logoutBtnBlocked" type="button" class="btn ghost">로그아웃</button>
       </div>
     </div>
@@ -74,7 +80,16 @@
           <strong id="churchNameLabel"></strong>
           <span class="app-header-sub">교회관리시스템</span>
         </div>
-        <button id="logoutBtn" type="button" class="btn ghost small">로그아웃</button>
+        <div class="app-header-actions">
+          <!-- 교회 출석부로 이동 (출석부와 같은 계정 - 로그인된 채로 메인 화면이 열림, js/sso.js) -->
+          <a
+            class="app-link-btn"
+            href="https://church-attendance-six.vercel.app/"
+            data-sso-link
+            >📋 교회 출석부</a
+          >
+          <button id="logoutBtn" type="button" class="btn ghost small">로그아웃</button>
+        </div>
       </header>
 
       <nav class="app-nav">
@@ -552,6 +567,7 @@
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="js/supabase-init.js"></script>
+    <script src="js/sso.js"></script>
     <script src="js/state.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>

@@ -1300,3 +1300,48 @@ input.field-error {
   border-radius: 8px;
   padding: 8px 10px;
 }
+
+/* =========================================================
+   [신규] 교회 출석부 이동 링크 (상단 헤더 / 안내 화면)
+   - 금색 바탕으로 눈에 띄게. 출석부와 같은 계정이라 로그인된 채로 이동(js/sso.js)
+   ========================================================= */
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.app-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 9px;
+  border: 1px solid #8f6a22;
+  background: linear-gradient(135deg, #f1d9a4 0%, #d9b274 55%, #c79d58 100%);
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px -6px rgba(173, 132, 56, 0.7);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.app-link-btn:hover,
+.app-link-btn:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px -8px rgba(173, 132, 56, 0.8);
+}
+.app-link-btn.sso-loading {
+  opacity: 0.65;
+  pointer-events: none;
+}
+@media (max-width: 420px) {
+  .app-link-btn {
+    padding: 7px 10px;
+    font-size: 12.5px;
+  }
+  .app-header-actions {
+    gap: 6px;
+  }
+}
