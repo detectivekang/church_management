@@ -34,6 +34,10 @@ function fmtWon(n) {
 function fmtWonShort(n) {
   const amt = Number(n) || 0;
   if (amt === 0) return "";
+  if (amt >= 100000000) {
+    /* 1억 이상은 억 단위로 (예: 900,000,000 -> 9억, 912,000,000 -> 9.1억) */
+    return (Math.round((amt / 100000000) * 10) / 10).toLocaleString("ko-KR") + "억";
+  }
   if (amt >= 10000) return Math.round(amt / 10000).toLocaleString("ko-KR") + "만";
   return amt.toLocaleString("ko-KR");
 }
