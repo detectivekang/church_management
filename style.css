@@ -1345,3 +1345,46 @@ input.field-error {
     gap: 6px;
   }
 }
+
+/* =========================================================
+   [신규] 휴대폰 상태표시줄 / 전면 카메라(노치·펀치홀) / 하단 내비게이션 여백
+   - 화면이 시스템 영역까지 그려지는 환경(PWA, 안드로이드 앱 WebView 등)에서
+     헤더·버튼이 카메라/상태표시줄/내비게이션 바와 겹치지 않도록 여백을 줌
+   - 평범한 브라우저(상태표시줄이 따로 있는 경우)에서는 값이 0이라 달라지는 게 없음
+   - 앱 WebView는 env() 값을 0으로 돌려주는 경우가 있어서, 그때만 js/safe-area.js가
+     html에 wv-fallback 클래스를 붙여 기본 여백(상단 32px / 하단 48px)을 적용함
+   ========================================================= */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+html.wv-fallback {
+  --safe-top: 32px;
+  --safe-bottom: 48px;
+}
+body {
+  padding-bottom: var(--safe-bottom);
+}
+.app-header {
+  padding-top: calc(15px + var(--safe-top));
+  padding-left: max(20px, var(--safe-left));
+  padding-right: max(20px, var(--safe-right));
+}
+.center-wrap,
+.login-screen {
+  padding-top: calc(24px + var(--safe-top));
+  padding-bottom: calc(24px + var(--safe-bottom));
+  padding-left: max(24px, var(--safe-left));
+  padding-right: max(24px, var(--safe-right));
+}
+.modal-overlay {
+  padding-top: calc(16px + var(--safe-top));
+  padding-bottom: calc(16px + var(--safe-bottom));
+  padding-left: max(16px, var(--safe-left));
+  padding-right: max(16px, var(--safe-right));
+}
+.app-toast {
+  bottom: calc(30px + var(--safe-bottom));
+}
