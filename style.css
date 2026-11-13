@@ -4,7 +4,7 @@
   --line: #e4e7ee;
   --accent: #26436f;
   --accent-2: #3d6ba3;
-  --gold: #ad8438;
+  --gold: #8f6a22; /* 글자로 쓸 때 대비 4.9:1 (이전 #ad8438 는 3.4:1) */
   --bg: #f3f4f8;
   --danger: #c0392b;
   --shadow-sm: 0 1px 2px rgba(23, 32, 51, 0.05), 0 1px 1px rgba(23, 32, 51, 0.04);
@@ -111,7 +111,7 @@ body {
   gap: 10px;
   margin: 14px 0 10px;
   color: #8892a0;
-  font-size: 12px;
+  font-size: 13px;
 }
 .oauth-divider::before,
 .oauth-divider::after {
@@ -141,7 +141,7 @@ body {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   flex-shrink: 0;
 }
@@ -170,7 +170,7 @@ body {
   line-height: 1.5;
 }
 .hint-text {
-  font-size: 12.5px;
+  font-size: 13px;
   color: #8892a0;
   margin-top: 16px;
   line-height: 1.5;
@@ -180,7 +180,7 @@ body {
 }
 .form-field label {
   display: block;
-  font-size: 12.5px;
+  font-size: 13px;
   color: #6b7686;
   margin-bottom: 4px;
 }
@@ -249,7 +249,7 @@ input.field-error {
 }
 .error-text {
   color: var(--danger);
-  font-size: 12.5px;
+  font-size: 13px;
   min-height: 16px;
   margin-bottom: 8px;
 }
@@ -274,7 +274,7 @@ input.field-error {
   letter-spacing: -0.01em;
 }
 .app-header-sub {
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--gold);
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -298,7 +298,7 @@ input.field-error {
   width: auto;
 }
 .list-count {
-  font-size: 12.5px;
+  font-size: 13px;
   color: #6b7686;
   margin-bottom: 10px;
 }
@@ -333,13 +333,13 @@ input.field-error {
   font-size: 14.5px;
 }
 .list-card-sub {
-  font-size: 12.5px;
+  font-size: 13px;
   color: #6b7686;
   margin-top: 2px;
 }
 .badge {
   display: inline-block;
-  font-size: 11px;
+  font-size: 13px;
   padding: 2px 6px;
   border-radius: 5px;
   margin-left: 6px;
@@ -403,7 +403,7 @@ input.field-error {
 }
 .roster-status-select {
   width: auto;
-  font-size: 12.5px;
+  font-size: 13px;
   padding: 5px 8px;
   margin-right: 6px;
 }
@@ -472,7 +472,7 @@ input.field-error {
   margin-bottom: 10px;
 }
 .sms-quick-label {
-  font-size: 12.5px;
+  font-size: 13px;
   color: #6b7686;
   margin-right: 2px;
 }
@@ -481,7 +481,7 @@ input.field-error {
   background: #fff;
   border-radius: 16px;
   padding: 5px 12px;
-  font-size: 12.5px;
+  font-size: 13px;
   cursor: pointer;
   color: var(--ink);
 }
@@ -513,7 +513,7 @@ input.field-error {
 }
 .sms-recipient-sub {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   color: #8892a0;
 }
 .modal-tabs {
@@ -563,7 +563,7 @@ input.field-error {
   background: none;
   border: none;
   color: #b0392b;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
 }
 .visit-content {
@@ -572,7 +572,7 @@ input.field-error {
   white-space: pre-line;
 }
 .visit-prayer {
-  font-size: 12.5px;
+  font-size: 13px;
   color: #6b7686;
   margin-top: 4px;
 }
@@ -660,7 +660,7 @@ input.field-error {
   object-fit: cover;
 }
 .photo-preview-empty {
-  font-size: 12px;
+  font-size: 13px;
   color: #a3abb8;
 }
 .photo-upload-actions {
@@ -695,7 +695,7 @@ input.field-error {
 }
 .continue-entry-label {
   margin-right: auto;
-  font-size: 12.5px;
+  font-size: 13px;
   color: #6b7686;
 }
 .custom-field-row {
@@ -709,7 +709,7 @@ input.field-error {
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--danger);
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   padding: 0 10px;
 }
@@ -767,7 +767,7 @@ input.field-error {
   border: none;
   background: none;
   color: #8892a0;
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -784,7 +784,7 @@ input.field-error {
 }
 .org-count-badge {
   display: inline-block;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--accent);
   background: #eef4fa;
@@ -885,7 +885,7 @@ input.field-error {
   line-height: 1.2;
 }
 .home-stat-label {
-  font-size: 12px;
+  font-size: 13px;
   opacity: 0.92;
 }
 .home-quick-grid {
@@ -899,7 +899,7 @@ input.field-error {
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 12px 6px;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--ink);
   cursor: pointer;
@@ -934,7 +934,7 @@ input.field-error {
   height: 100%;
 }
 .home-chart-value {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--accent);
   min-height: 14px;
@@ -953,7 +953,7 @@ input.field-error {
   border-radius: 5px 5px 0 0;
 }
 .home-chart-label {
-  font-size: 11px;
+  font-size: 13px;
   color: #8892a0;
   margin-top: 6px;
 }
@@ -1001,14 +1001,14 @@ input.field-error {
   font-size: 16px;
 }
 .home-newfamily-name {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .home-newfamily-sub {
-  font-size: 11px;
+  font-size: 13px;
   color: #8892a0;
   margin-top: 1px;
 }
@@ -1025,7 +1025,7 @@ input.field-error {
 .home-dept-table-el {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .home-dept-table-el th,
 .home-dept-table-el td {
@@ -1037,7 +1037,7 @@ input.field-error {
 .home-dept-table-el th {
   color: var(--ink-soft);
   font-weight: 700;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.03em;
 }
 .home-dept-table-el td:first-child,
@@ -1066,7 +1066,7 @@ input.field-error {
   border-radius: 4px;
 }
 .home-dept-pct {
-  font-size: 11px;
+  font-size: 13px;
   color: #6b7686;
   width: 32px;
   text-align: right;
@@ -1097,7 +1097,7 @@ input.field-error {
 .parishioner-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: 13px;
   min-width: 860px;
 }
 .parishioner-table thead th {
@@ -1106,7 +1106,7 @@ input.field-error {
   background: #f7f8fb;
   color: var(--ink-soft);
   font-weight: 700;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.03em;
   padding: 11px 10px;
   text-align: left;
@@ -1135,7 +1135,7 @@ input.field-error {
 }
 .parishioner-table .pt-muted {
   color: #8892a0;
-  font-size: 11px;
+  font-size: 13px;
   margin-left: 3px;
 }
 .pt-avatar {
@@ -1149,7 +1149,7 @@ input.field-error {
 @media (max-width: 640px) {
   .parishioner-table {
     min-width: 760px;
-    font-size: 12px;
+    font-size: 13px;
   }
 }
 
@@ -1215,7 +1215,7 @@ input.field-error {
   border: none;
   color: #b7bec9;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   padding: 2px 4px;
   flex-shrink: 0;
 }
@@ -1240,7 +1240,7 @@ input.field-error {
   justify-content: center;
   gap: 12px;
   margin-top: 10px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: #6b7686;
 }
 .sms-history-pager .btn:disabled {
@@ -1260,7 +1260,7 @@ input.field-error {
 
 .sms-history-toggle {
   margin-left: 6px;
-  font-size: 11px;
+  font-size: 13px;
   color: #8a94a3;
 }
 .sms-history-detail {
@@ -1272,7 +1272,7 @@ input.field-error {
   cursor: text;
 }
 .sms-history-detail-label {
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 700;
   color: #6b7686;
   margin: 8px 0 4px;
@@ -1291,7 +1291,7 @@ input.field-error {
   background: #eef4fa;
   border-radius: 6px;
   padding: 2px 8px;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .sms-history-detail-msg {
   white-space: pre-wrap;
@@ -1339,7 +1339,7 @@ input.field-error {
 @media (max-width: 420px) {
   .app-link-btn {
     padding: 7px 10px;
-    font-size: 12.5px;
+    font-size: 13px;
   }
   .app-header-actions {
     gap: 6px;
@@ -1431,11 +1431,198 @@ body {
 .home-chart-value {
   white-space: nowrap;
   overflow: visible;
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: -0.03em;
 }
 @media (max-width: 420px) {
   .home-stat-card {
     padding: 16px 12px;
   }
+}
+
+/* =========================================================
+   [신규] 기부금영수증 화면 (30~60대 운영자가 보기 편하게 큰 글씨, 큰 버튼)
+   ========================================================= */
+.rcpt-note {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-soft, #4b5566);
+  margin: 8px 0 12px;
+}
+.rcpt-warn {
+  display: none;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: #fff6e0;
+  border: 1px solid #e3b95a;
+  color: #7a5200;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.rcpt-warn .btn {
+  margin-left: 8px;
+}
+.rcpt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.rcpt-toolbar .btn {
+  min-height: 44px;
+  font-size: 15px;
+}
+.rcpt-summary {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 6px 0 2px;
+}
+.rcpt-types {
+  font-size: 13.5px;
+  color: #5d6675;
+  margin-bottom: 10px;
+}
+.rcpt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rcpt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px;
+  background: #fff;
+  border: 1px solid var(--line, #e2e6ee);
+  border-radius: 12px;
+}
+.rcpt-row-main {
+  min-width: 0;
+  flex: 1;
+}
+.rcpt-name {
+  font-size: 17px;
+  font-weight: 700;
+}
+.rcpt-meta {
+  font-size: 15px;
+  color: #3f4857;
+  margin: 2px 0 6px;
+}
+.rcpt-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.rcpt-badge.todo {
+  background: #eef1f6;
+  color: #4b5566;
+}
+.rcpt-badge.done {
+  background: #e3f4ea;
+  color: #1c6b3f;
+}
+.rcpt-warn-line {
+  margin-top: 6px;
+  font-size: 13.5px;
+  color: #9a5a00;
+  line-height: 1.5;
+}
+.rcpt-row-act {
+  flex-shrink: 0;
+}
+.rcpt-btn {
+  min-height: 46px;
+  padding: 0 16px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.rcpt-ledger-row {
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--line, #e2e6ee);
+  border-radius: 12px;
+  font-size: 15px;
+}
+.rcpt-ledger-row.voided {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.rcpt-ledger-row.voided .rcpt-meta {
+  text-decoration: none;
+}
+.rcpt-void {
+  margin-top: 4px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: #b3402a;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.rcpt-empty {
+  padding: 18px;
+  text-align: center;
+  color: #6b7482;
+  font-size: 15px;
+}
+.rcpt-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.rcpt-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15.5px;
+  min-height: 40px;
+}
+.rcpt-check input {
+  width: 20px;
+  height: 20px;
+}
+.rcpt-error {
+  min-height: 20px;
+  color: #b3402a;
+  font-size: 14px;
+  font-weight: 700;
+}
+@media (max-width: 480px) {
+  .rcpt-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .rcpt-btn {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   [UX] 30~60대 사용자를 위한 가독성 레이어
+   - 최소 글자 13px(위 변경), 터치 영역 최소 44px(주요 버튼) / 40px(작은 버튼)
+   - 글자 크기 설정: 보통 / 크게 / 아주 크게 (js/font-scale.js, 헤더 버튼)
+     px 단위 화면이라 확대(zoom)로 키움
+   ========================================================= */
+html.fs-large body {
+  zoom: 1.12;
+}
+html.fs-xlarge body {
+  zoom: 1.25;
+}
+.btn {
+  min-height: 44px;
+}
+.btn.small {
+  min-height: 40px;
+}
+.app-nav button,
+.app-nav a {
+  min-height: 44px;
 }

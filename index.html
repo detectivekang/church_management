@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
       <script src="js/safe-area.js"></script>
+      <script src="js/font-scale.js"></script>
   </head>
   <body>
     <!-- 로그인 화면 -->
@@ -82,6 +83,7 @@
           <span class="app-header-sub">교회관리시스템</span>
         </div>
         <div class="app-header-actions">
+          <button type="button" class="btn ghost small" data-font-scale-btn data-short>🔠 보통</button>
           <!-- 교회 출석부로 이동 (출석부와 같은 계정 - 로그인된 채로 메인 화면이 열림, js/sso.js) -->
           <a
             class="app-link-btn"
@@ -324,6 +326,27 @@
 
         <div class="form-section-title" style="margin-top: 26px">개인별 연간 합계</div>
         <div id="offeringSummary" class="list-wrap" style="margin-top: 8px"></div>
+
+        <!-- [신규] 기부금영수증 발급 (소득세법 시행규칙 별지 제45호의2서식) - js/receipts.js -->
+        <div class="form-section-title" style="margin-top: 34px">🧾 기부금영수증 발급 (연말정산용)</div>
+        <p class="rcpt-note">
+          위 연도의 헌금 기록을 합산해 공식 서식의 기부금영수증을 출력합니다. 금액과 일련번호는
+          자동으로 정해지며, 한 번 발급하면 발급 대장에 기록됩니다.
+          <b>인쇄는 PC 브라우저에서 해주세요</b> (인쇄 창에서 "PDF로 저장"도 가능).
+        </p>
+        <div class="rcpt-warn" id="rcptSettingsWarn" style="display: none">
+          영수증을 발급하려면 먼저 교회(단체) 정보를 입력해야 합니다.
+          <button type="button" id="rcptSettingsWarnBtn" class="btn small">정보 입력하기</button>
+        </div>
+        <div class="rcpt-toolbar">
+          <button type="button" id="rcptSettingsBtn" class="btn ghost">⚙ 교회(단체) 정보 설정</button>
+          <button type="button" id="rcptLedgerExcelBtn" class="btn ghost">⬇ 발급 대장 엑셀</button>
+        </div>
+        <div class="rcpt-summary" id="rcptSummary"></div>
+        <div class="rcpt-types" id="rcptTypesNote"></div>
+        <div id="rcptDonorList" class="rcpt-list"></div>
+        <div class="form-section-title" style="margin-top: 26px">발급 대장</div>
+        <div id="rcptLedger" class="rcpt-list"></div>
       </main>
       <main class="app-main" id="educationPanel" style="display: none">
         <div class="form-section-title">교육과정 등록</div>
@@ -565,6 +588,56 @@
       </main>
     </div>
 
+    <!-- [신규] 기부금영수증: 교회(단체) 정보 설정 -->
+    <div class="modal-overlay" id="rcptSettingsOverlay" style="display: none">
+      <div class="modal-card wide">
+        <div class="modal-title">교회(기부금 단체) 정보</div>
+        <div class="modal-body scrollable">
+          <p class="rcpt-note" style="margin-top: 0">
+            영수증의 "기부금 단체" 칸에 들어갑니다. 고유번호증(또는 사업자등록증)과 똑같이 입력해주세요.
+          </p>
+          <div class="form-grid">
+            <div class="form-field"><label for="rcptOrgName">단체명 (교회 이름)</label><input id="rcptOrgName" type="text" /></div>
+            <div class="form-field"><label for="rcptRegNo">고유번호 또는 사업자등록번호</label><input id="rcptRegNo" type="text" inputmode="numeric" placeholder="예: 123-45-67890" /></div>
+            <div class="form-field"><label for="rcptOrgAddress">소재지 (교회 주소)</label><input id="rcptOrgAddress" type="text" /></div>
+            <div class="form-field"><label for="rcptRepresentative">대표자 성명 (담임목사)</label><input id="rcptRepresentative" type="text" /></div>
+          </div>
+          <div class="form-section-title" style="margin-top: 18px">영수증에 포함할 헌금 종류</div>
+          <div id="rcptTypeChecks" class="rcpt-checks"></div>
+          <p class="rcpt-note">
+            식비·회비처럼 기부금 공제 대상이 아닌 항목은 체크를 해제하세요. 기부금 단체 근거법령은
+            종교단체(코드 405), 기부 구분은 종교단체 기부금(코드 41)으로 자동 출력됩니다.
+          </p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="rcptSettingsCancel" class="btn ghost">취소</button>
+          <button type="button" id="rcptSettingsSave" class="btn">저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- [신규] 기부금영수증: 주민등록번호 입력 (서버에 저장하지 않음) -->
+    <div class="modal-overlay" id="rcptRrnOverlay" style="display: none">
+      <div class="modal-card">
+        <div class="modal-title" id="rcptRrnTitle">기부금영수증 출력</div>
+        <div class="modal-body">
+          <div class="form-field">
+            <label for="rcptRrnInput">기부자 주민등록번호 (선택)</label>
+            <input id="rcptRrnInput" type="password" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="숫자 13자리" />
+          </div>
+          <div id="rcptRrnError" class="rcpt-error"></div>
+          <p class="rcpt-note">
+            연말정산 자료에 필요한 번호입니다. <b>서버에 저장되지 않고</b> 이 영수증 인쇄물에만 들어가며,
+            입력값은 출력 직후 지워집니다. 비워두면 빈칸으로 출력되어 직접 적을 수 있습니다.
+          </p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="rcptRrnCancel" class="btn ghost">취소</button>
+          <button type="button" id="rcptRrnConfirm" class="btn">출력하기</button>
+        </div>
+      </div>
+    </div>
+
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="js/supabase-init.js"></script>
@@ -577,6 +650,7 @@
     <script src="js/home.js"></script>
     <script src="js/sms.js"></script>
     <script src="js/offerings.js"></script>
+    <script src="js/receipts.js"></script>
     <script src="js/education.js"></script>
     <script src="js/org.js"></script>
     <script src="js/families.js"></script>
